@@ -16,6 +16,9 @@
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
 
+  # Use gzip for initrd (kernel doesn't support zstd decompression)
+  boot.initrd.compressor = "gzip";
+
   # Kernel parameters for SM8550
   boot.kernelParams = [
     "console=ttyMSM0,115200"  # Serial console on Qualcomm UART

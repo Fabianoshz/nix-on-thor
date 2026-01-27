@@ -53,7 +53,30 @@ pkgs.stdenv.mkDerivation rec {
 
   configurePhase = ''
     runHook preConfigure
+
+    # Create ayn.env file for direct kernel boot from SD card
+    mkdir -p board/qualcomm
+    cat > board/qualcomm/ayn.env << 'EOF'
+bootdelay=1
+stdin=button_kbd,serial
+stdout=vidconsole,serial
+stderr=vidconsole,serial
+preboot=scsi scan; usb start; mmc rescan
+bootcmd=mmc dev 0; fatload mmc 0:1 0x40000000 dtbs/qcom/qcs8550-ayn-thor.dtb; fatload mmc 0:1 0x44000000 initrd; setenv initrd_size $${filesize}; fatload mmc 0:1 0x40080000 Image; booti 0x40080000 0x44000000:$${initrd_size} 0x40000000
+bootargs=init=/nix/var/nix/profiles/system/init console=ttyMSM0,115200 console=tty0 earlycon=qcom_geni,0x00a9c000 earlyprintk loglevel=8 debug ignore_loglevel
+EOF
+
     make CROSS_COMPILE=aarch64-unknown-linux-gnu- O=output qcom_defconfig
+
+    # Enable direct boot and environment file
+    cat >> output/.config << 'EOF'
+CONFIG_DEFAULT_ENV_FILE="board/qualcomm/ayn.env"
+CONFIG_BOOTDELAY=1
+CONFIG_CMD_BOOTI=y
+CONFIG_AUTOBOOT_PROMPT="test"
+EOF
+
+    make CROSS_COMPILE=aarch64-unknown-linux-gnu- O=output olddefconfig
     runHook postConfigure
   '';
 

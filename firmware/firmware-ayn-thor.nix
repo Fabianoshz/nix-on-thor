@@ -8,7 +8,7 @@ stdenv.mkDerivation {
     owner = "ROCKNIX";
     repo = "distribution";
     rev = "next";
-    hash = "sha256-maxTwbLymW+AYg2vIXWD4/xOqPIzZb+300K38TLFysE=";
+    hash = "sha256-wbK+TBhRxGjEIWsRfYie579OlJGIKhhkI22mEoTs/9c=";
   };
 
   dontBuild = true;
