@@ -19,6 +19,15 @@
   # Use gzip for initrd (kernel doesn't support zstd decompression)
   boot.initrd.compressor = "gzip";
 
+  # Capture boot logs to SD card for debugging
+  boot.initrd.postDeviceCommands = ''
+    mkdir -p /mnt-log
+    mount /dev/mmcblk0p1 /mnt-log || true
+    dmesg > /mnt-log/boot.log 2>&1
+    echo "Initrd stage reached at $(date)" >> /mnt-log/boot.log
+    umount /mnt-log || true
+  '';
+
   # Kernel parameters for SM8550
   boot.kernelParams = [
     "console=ttyMSM0,115200"  # Serial console on Qualcomm UART
